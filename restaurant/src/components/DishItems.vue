@@ -1,71 +1,76 @@
 <template>
-    <div class="dish-item">
+  <div class="dish-card">
+    <img :src="dish.image || defaultImage" :alt="dish.name" class="dish-image" />
+    <div class="dish-info">
       <h3>{{ dish.name }}</h3>
       <p>{{ dish.description }}</p>
-      <div class="dish-footer">
-        <span class="price">{{ dish.price.toFixed(2) }} €</span>
-        <button @click="addToCart">Ajouter au panier</button>
-      </div>
-      <span v-if="dish.isNew" class="new-badge">Nouveau</span>
+      <p class="price">{{ (dish.price).toFixed(2) }} €</p>
+      <button @click="$emit('add-to-cart', dish)">Ajouter au panier</button>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    props: {
-      dish: {
-        type: Object,
-        required: true
-      }
-    },
-    methods: {
-      addToCart() {
-        this.$emit('add-to-cart', this.dish)
-      }
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    dish: {
+      type: Object,
+      required: true
+    }
+  },
+  data() {
+    return {
+      defaultImage: 'https://via.placeholder.com/200x150?text=Plat' // Image par défaut
     }
   }
-  </script>
-  
-  <style scoped>
-  .dish-item {
-  border: 1px solid #ddd;
-  padding: 15px;
-  position: relative;
-  text-align: center;
-  background-color: white;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  border-radius: 8px;
-  margin-top: 2rem;
 }
+</script>
 
-.dish-footer {
+<style scoped>
+.dish-card {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-top: 45px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: center;
+  background-color: #fff;
 }
 
-.new-badge {
-  position: absolute;
-  top: 100px;
-  right: 84px;
-  background-color: green;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 16px;
-  font-size: 12px;
+.dish-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.dish-info {
+  padding: 10px;
+}
+
+.dish-info h3 {
+  margin: 10px 0;
+  font-size: 1.2em;
+}
+
+.price {
+  color: #28a745;
+  font-weight: bold;
 }
 
 button {
-  background-color: #4CAF50;
-  color: white;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
   border: none;
-  padding: 8px 16px;
+  border-radius: 5px;
   cursor: pointer;
-  border-radius: 4px;
+  transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #0056b3;
 }
-  </style>
+</style>

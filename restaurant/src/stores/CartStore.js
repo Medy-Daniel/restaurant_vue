@@ -1,31 +1,32 @@
-import { ref } from 'vue'
+import { reactive } from 'vue'
 
-export const cartStore = {
-  cart: ref([]),
-  orders: ref([]),
+export const cartStore = reactive({
+  cart: [],
 
   addToCart(dish) {
-    const existingDish = this.cart.value.find(item => item.id === dish.id)
-    if (existingDish) {
-      existingDish.quantity = (existingDish.quantity || 1) + 1
+    const found = this.cart.find((item) => item.id === dish.id)
+    if (found) {
+      found.quantity += 1
     } else {
-      this.cart.value.push({ ...dish, quantity: 1 })
+      this.cart.push({ ...dish, quantity: 1 })
+    }
+  },
+
+  decreaseQuantity(dishId) {
+    const found = this.cart.find((item) => item.id === dishId)
+    if (found) {
+      found.quantity -= 1
+      if (found.quantity <= 0) {
+        this.removeFromCart(dishId)
+      }
     }
   },
 
   removeFromCart(dishId) {
-    const index = this.cart.value.findIndex(item => item.id === dishId)
-    if (index !== -1) {
-      this.cart.value.splice(index, 1)
-    }
+    this.cart = this.cart.filter((item) => item.id !== dishId)
   },
 
   clearCart() {
-    this.cart.value = []
-  },
-
-  get totalPrice() {
-    return this.cart.value.reduce((total, item) => 
-      total + (item.price * (item.quantity || 1)), 0)
+    this.cart = []
   }
-}
+})

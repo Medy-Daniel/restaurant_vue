@@ -12,6 +12,7 @@
   </div>
 </template>
 
+
 <script>
 import { ref, computed } from 'vue'
 import { menuService } from '../services/MenuService'
@@ -50,7 +51,7 @@ export default {
 
 .dishes {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
   gap: 20px;
 }
 </style>
