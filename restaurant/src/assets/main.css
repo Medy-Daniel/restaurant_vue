@@ -102,32 +102,22 @@ header nav a.router-link-exact-active {
 
 /* Desktop (min-width: 1024px) */
 @media (min-width: 1024px) {
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 1.5rem;
-  }
+
 
   #app {
-    max-width: 1200px;
-    display: grid;
-    grid-template-columns: 1fr 2fr; /* Meilleur équilibre entre contenu principal et navigation */
-    gap: 2rem;
-  }
-
-  header {
-    padding: 1.5rem 0;
-    font-size: 1.25rem;
+    padding: 2rem;
+    max-width: 92%;
   }
 
   header nav {
-    gap: 2.5rem;
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+
   }
 
   .component {
-    padding: 2rem;
-    border-radius: 16px;
     margin-bottom: 2rem;
+    padding: 2rem;
   }
 }

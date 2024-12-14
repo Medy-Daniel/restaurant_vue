@@ -1,24 +1,56 @@
 <template>
     <div>
-        <h1>Cart Page</h1>
-        <!-- Add your cart page content here -->
+      <h1>Panier</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Plat</th>
+            <th>Quantité</th>
+            <th>Prix</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in cart" :key="item.id">
+            <td>{{ item.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ (item.price * item.quantity) }} €</td>
+            <td>
+                <button @click="clearCart">Supprimer</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Total: {{ totalPrice }} €</p>
+      <button @click="clearCart">Vider le panier</button>
     </div>
-</template>
-
-<script>
-export default {
+  </template>
+  
+  <script>
+  import { cartStore } from '../stores/CartStore'
+  
+  export default {
     name: 'CartPage',
-    data() {
-        return {
-            // Add your data properties here
-        };
+    computed: {
+    cart() {
+        return cartStore.cart;
     },
+    totalPrice() {
+        try {
+            return cartStore.totalPrice;
+        } catch (error) {
+            console.error('Erreur lors du calcul du prix total :', error);
+            return 0; // Ou une valeur par défaut
+        }
+    }
+},
     methods: {
-        // Add your methods here
-    },
-};
-</script>
-
-<style scoped>
-/* Add your styles here */
-</style>
+      removeFromCart(dishId) {
+        cartStore.removeFromCart(dishId)
+      },
+      clearCart() {
+        cartStore.clearCart()
+      }
+    }
+  }
+  </script>

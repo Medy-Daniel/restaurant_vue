@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 export const cartStore = {
   cart: ref([]),
@@ -24,8 +24,8 @@ export const cartStore = {
     this.cart.value = []
   },
 
-  totalPrice: computed(() => 
-    this.cart.value.reduce((total, item) => 
+  get totalPrice() {
+    return this.cart.value.reduce((total, item) => 
       total + (item.price * (item.quantity || 1)), 0)
-  )
+  }
 }

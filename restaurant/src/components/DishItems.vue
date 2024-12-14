@@ -28,34 +28,44 @@
   
   <style scoped>
   .dish-item {
-    border: 1px solid #ddd;
-    padding: 15px;
-    position: relative;
-    text-align: center;
-  }
-  
-  .dish-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
-  .new-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: green;
-    color: white;
-    padding: 5px;
-    border-radius: 3px;
-  }
-  
-  button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
+  border: 1px solid #ddd;
+  padding: 15px;
+  position: relative;
+  text-align: center;
+  background-color: white;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.dish-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 45px;
+}
+
+.new-badge {
+  position: absolute;
+  top: 100px;
+  right: 84px;
+  background-color: green;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
   </style>
