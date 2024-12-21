@@ -16,7 +16,7 @@
 import { ref, computed, watch } from 'vue';
 import { menuService } from '../services/MenuService';
 import { cartStore } from '../stores/CartStore';
-import DishItem from './DishItem.vue';
+import DishItem from './DishItems.vue';
 
 export default {
   components: { DishItem },
@@ -39,7 +39,7 @@ export default {
         window.alert(`${dish.name} a été ajouté au panier`);
       }
     };
-
+  
     return {
       menu,
       cart,
