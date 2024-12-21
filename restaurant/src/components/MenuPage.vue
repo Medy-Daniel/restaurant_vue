@@ -12,7 +12,6 @@
   </div>
 </template>
 
-
 <script>
 import { ref, computed } from 'vue'
 import { menuService } from '../services/MenuService'
@@ -27,7 +26,6 @@ export default {
 
     const addToCart = (dish) => {
       cartStore.addToCart(dish)
-      // TODO: Ajouter un toast de confirmation
       if (window && window.alert) {
         window.alert(`${dish.name} a été ajouté au panier`)
       }
@@ -44,14 +42,33 @@ export default {
 
 <style scoped>
 .menu-page {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2rem;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 2rem;
 }
 
 .dishes {
   display: grid;
-  /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .dishes {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .menu-page {
+    padding: 1rem;
+  }
 }
 </style>

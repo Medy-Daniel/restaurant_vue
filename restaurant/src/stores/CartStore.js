@@ -23,7 +23,10 @@ export const cartStore = reactive({
   },
 
   removeFromCart(dishId) {
-    this.cart = this.cart.filter((item) => item.id !== dishId)
+    const index = this.cart.findIndex((item) => item.id === dishId)
+    if (index !== -1) {
+      this.cart.splice(index, 1)
+    }
   },
 
   clearCart() {
