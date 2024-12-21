@@ -220,6 +220,7 @@ export default {
   font-size: 0.8rem;
   color: #666;
   font-weight: normal;
+  margin-left: 1rem;
 }
 
 .checkout-btn {

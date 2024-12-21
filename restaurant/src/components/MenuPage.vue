@@ -6,38 +6,47 @@
         v-for="dish in menu"
         :key="dish.id"
         :dish="dish"
-        @add-to-cart="addToCart"
+        @add-to-cart="handleAddToCart"
       />
     </div>
   </div>
 </template>
 
 <script>
-import { ref, computed } from 'vue'
-import { menuService } from '../services/MenuService'
-import { cartStore } from '../stores/CartStore'
-import DishItem from './DishItems.vue'
+import { ref, computed, watch } from 'vue';
+import { menuService } from '../services/MenuService';
+import { cartStore } from '../stores/CartStore';
+import DishItem from './DishItem.vue';
 
 export default {
   components: { DishItem },
   setup() {
-    const menu = ref(menuService.getMenu())
-    const cart = computed(() => cartStore.cart)
+    const menu = ref(menuService.getMenu()); // La liste des plats
+    const cart = ref(cartStore.cart); // Le panier (local copie)
 
-    const addToCart = (dish) => {
-      cartStore.addToCart(dish)
+    // Watcher pour réagir aux changements dans le panier
+    watch(cart, (newCart, oldCart) => {
+      console.log('Le panier a été mis à jour :', newCart);
+    });
+
+    // Gestion de l'ajout d'un plat au panier
+    const handleAddToCart = (dish) => {
+      cartStore.addToCart(dish); // Mise à jour du store global
+      cart.value = [...cartStore.cart]; // Synchronisation locale du panier
+
+      // Notification utilisateur
       if (window && window.alert) {
-        window.alert(`${dish.name} a été ajouté au panier`)
+        window.alert(`${dish.name} a été ajouté au panier`);
       }
-    }
+    };
 
     return {
       menu,
       cart,
-      addToCart
-    }
-  }
-}
+      handleAddToCart,
+    };
+  },
+};
 </script>
 
 <style scoped>
