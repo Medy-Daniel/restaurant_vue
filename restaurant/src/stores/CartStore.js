@@ -1,7 +1,11 @@
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+
+// Créer la référence orders en dehors du store
+const orders = ref([])
 
 export const cartStore = reactive({
   cart: [],
+  orders, // Utiliser la référence directement
 
   addToCart(dish) {
     const found = this.cart.find((item) => item.id === dish.id)
@@ -31,5 +35,25 @@ export const cartStore = reactive({
 
   clearCart() {
     this.cart = []
+  },
+
+  addOrder(orderDetails) {
+    const order = {
+      id: Date.now(),
+      items: [...this.cart],
+      total: orderDetails.total,
+      status: 'En cours',
+      date: new Date().toISOString()
+    }
+    this.orders.push(order) // Utiliser push directement sur la référence
+    this.clearCart()
+    return order.id
+  },
+
+  updateOrderStatus(orderId, status) {
+    const orderIndex = this.orders.findIndex(o => o.id === orderId)
+    if (orderIndex !== -1) {
+      this.orders[orderIndex].status = status
+    }
   }
 })

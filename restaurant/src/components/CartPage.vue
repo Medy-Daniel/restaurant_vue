@@ -11,7 +11,7 @@
     <div class="cart-items">
       <div v-for="item in cart" :key="item.id" class="cart-item">
         <div class="product-info">
-          <img :src="item.image" :alt="item.name">
+          <img :src="item.image" :alt="item.name" />
           <div class="product-details">
             <h3>{{ item.name }}</h3>
             <p class="price">{{ item.price }} €</p>
@@ -19,7 +19,7 @@
         </div>
         <div class="quantity-controls">
           <button @click="decreaseQuantity(item.id)">−</button>
-          <input type="text" :value="item.quantity" readonly>
+          <input type="text" :value="item.quantity" readonly />
           <button @click="increaseQuantity(item)">+</button>
         </div>
         <div class="subtotal">
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Résumé -->
-    <div class="cart-summary">
+    <div v-if="cart.length > 0" class="cart-summary">
       <div class="summary-box">
         <h2>Total panier</h2>
         <div class="summary-row">
@@ -43,46 +43,69 @@
           <span>Total</span>
           <div class="total-amount">
             <span class="amount">{{ cartTotal }} €</span>
-            <span class="TVA">(dont {{ cartTVA }} € de TVA à 20% (oui on as pensé à la TVA))</span>
+            <span class="TVA"
+              >(dont {{ cartTVA }} € de TVA à 20% (oui on as pensé à la
+              TVA))</span
+            >
           </div>
         </div>
-        <button class="checkout-btn">
+        <button @click="submitOrder" class="checkout-btn">
           Valider la commande →
         </button>
       </div>
+    </div>
+
+    <!-- Panier vide -->
+    <div v-if="cart.length === 0" class="empty-cart">
+      Votre panier est vide.
+      <RouterLink to="/menu">Retourner au menu</RouterLink>
     </div>
   </div>
 </template>
 
 <script>
-import { cartStore } from '../stores/CartStore'
-import { ref, watch } from 'vue'
+import { cartStore } from "../stores/CartStore";
+import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
-  name: 'CartPage',
+  name: "CartPage",
   setup() {
     // État local pour le total et la TVA
-    const cartTotal = ref('0.00')
-    const cartTVA = ref('0.00')
+    const cartTotal = ref("0.00");
+    const cartTVA = ref("0.00");
+    const router = useRouter();
 
     // Fonction de calcul du total
     const calculateTotal = (cartItems) => {
-      const total = cartItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-      ).toFixed(2)
-      cartTotal.value = total
-      cartTVA.value = (total * 0.2).toFixed(2)
-    }
+      const total = cartItems
+        .reduce((sum, item) => sum + item.price * item.quantity, 0)
+        .toFixed(2);
+      cartTotal.value = total;
+      cartTVA.value = (total * 0.2).toFixed(2);
+    };
+
+    // Fonction de validation de commande
+    const submitOrder = () => {
+      const orderDetails = {
+        total: cartTotal.value,
+      };
+
+      // Ajouter la commande via le store
+      const orderId = cartStore.addOrder(orderDetails);
+
+      // Rediriger vers la page des commandes
+      router.push("/admin/orders");
+    };
 
     // Watcher sur le panier
     watch(
       () => cartStore.cart,
       (newCart) => {
-        calculateTotal(newCart)
+        calculateTotal(newCart);
       },
       { deep: true, immediate: true }
-    )
+    );
 
     return {
       cart: cartStore.cart,
@@ -90,10 +113,11 @@ export default {
       cartTVA,
       increaseQuantity: (dish) => cartStore.addToCart(dish),
       decreaseQuantity: (dishId) => cartStore.decreaseQuantity(dishId),
-      removeFromCart: (dishId) => cartStore.removeFromCart(dishId)
-    }
-  }
-}
+      removeFromCart: (dishId) => cartStore.removeFromCart(dishId),
+      submitOrder, // Ajoutez cette ligne
+    };
+  },
+};
 </script>
 
 <style scoped>
@@ -188,7 +212,6 @@ export default {
   opacity: 1;
 }
 
-
 .cart-summary {
   margin-top: 2rem;
 }
@@ -197,7 +220,7 @@ export default {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .summary-box h2 {
@@ -247,20 +270,20 @@ export default {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .cart-header {
     display: none;
   }
-  
+
   .product-info {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .quantity-controls {
     justify-content: center;
   }
-  
+
   .subtotal {
     justify-content: center;
   }
