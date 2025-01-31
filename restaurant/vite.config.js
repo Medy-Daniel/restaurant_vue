@@ -10,6 +10,15 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+  build: {
+    outDir: "dist",
+    rollupOptions : {
+      output: {
+        format: 'cjs',
+        entryFileNames : '[name].cjs',
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
