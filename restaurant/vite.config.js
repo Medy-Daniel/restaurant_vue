@@ -11,13 +11,8 @@ export default defineConfig({
     vueDevTools(),
   ],
   build: {
-    outDir: "dist",
-    rollupOptions : {
-      output: {
-        format: 'cjs',
-        entryFileNames : '[name].cjs',
-      },
-    },
+    outDir: 'dist',
+    assetsDir: 'assets',
   },
   resolve: {
     alias: {
