@@ -11,7 +11,7 @@
     <div class="cart-items">
       <div v-for="item in cart" :key="item.id" class="cart-item">
         <div class="product-info">
-          <img :src="item.image" :alt="item.name" />
+          <img :src="item.image_url" :alt="item.name" />
           <div class="product-details">
             <h3>{{ item.name }}</h3>
             <p class="price">{{ item.price }} €</p>
@@ -64,19 +64,18 @@
 </template>
 
 <script>
-import { cartStore } from "../stores/CartStore";
 import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { api } from '../services/api';
 
 export default {
   name: "CartPage",
   setup() {
-    // État local pour le total et la TVA
+    const cart = ref(JSON.parse(localStorage.getItem('cart')) || []);
     const cartTotal = ref("0.00");
     const cartTVA = ref("0.00");
     const router = useRouter();
 
-    // Fonction de calcul du total
     const calculateTotal = (cartItems) => {
       const total = cartItems
         .reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -85,22 +84,58 @@ export default {
       cartTVA.value = (total * 0.2).toFixed(2);
     };
 
-    // Fonction de validation de commande
-    const submitOrder = () => {
-      const orderDetails = {
-        total: cartTotal.value,
-      };
 
-      // Ajouter la commande via le store
-      const orderId = cartStore.addOrder(orderDetails);
+    const increaseQuantity = (dish) =>{
+      const found = cart.value.find((item) => item.id === dish.id);
+      if (found) {
+        found.quantity += 1;
+      }else {
+        cart.value.push({ ...dish, quantity: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart.value));
+    }
 
-      // Rediriger vers la page des commandes
-      router.push("/admin/orders");
+    const decreaseQuantity = (dishId) => {
+      const found = cart.value.find((item) => item.id === dishId);
+      if (found) {
+        found.quantity -= 1;
+        if (found.quantity <= 0) {
+          removeFromCart(dishId);
+        }
+        localStorage.setItem('cart', JSON.stringify(cart.value));
+      }
     };
 
-    // Watcher sur le panier
+    const removeFromCart = (dishId) => {
+      const index = cart.value.findIndex((item) => item.id === dishId);
+      if (index !== -1) {
+        cart.value.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart.value));
+      }
+    };
+
+    const submitOrder = async () => {
+      try {
+        const orderDetails = {
+          total_amount: parseFloat(cartTotal.value),
+          vat_amount: parseFloat(cartTVA.value),
+          items: cart.value.map(item => ({
+            product_id: item.id,
+            quantity: item.quantity,
+            unit_price: item.price
+          }))
+        };
+
+        const response = await api.createOrder(orderDetails);
+        localStorage.removeItem('cart');
+        router.push(`/order-confirmation/${response.orderId}`);
+      } catch (error) {
+        console.error('Erreur lors de la création de la commande:', error);
+      }
+    };
+
     watch(
-      () => cartStore.cart,
+      cart,
       (newCart) => {
         calculateTotal(newCart);
       },
@@ -108,17 +143,20 @@ export default {
     );
 
     return {
-      cart: cartStore.cart,
+      cart,
       cartTotal,
       cartTVA,
-      increaseQuantity: (dish) => cartStore.addToCart(dish),
-      decreaseQuantity: (dishId) => cartStore.decreaseQuantity(dishId),
-      removeFromCart: (dishId) => cartStore.removeFromCart(dishId),
-      submitOrder, // Ajoutez cette ligne
+      submitOrder,
+      increaseQuantity,
+      decreaseQuantity,
+      removeFromCart,
     };
   },
 };
 </script>
+
+
+
 
 <style scoped>
 .cart-container {

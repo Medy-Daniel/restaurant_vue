@@ -8,18 +8,17 @@
 
     <div v-else class="order-list">
       <div v-for="order in orders" :key="order.id" class="order-item">
-        <h2>Commande #{{ order.id }}</h2>
-        <p class="order-date">{{ formatDate(order.date) }}</p>
+        <h2>Commande n°{{ order.id }}</h2>
+        <p class="order-date">{{ formatDate(order.created_at) }}</p>
         <div class="order-details">
           <div class="items-list">
-            <h3>Articles commandés :</h3>
             <ul>
               <li v-for="item in order.items" :key="item.id">
                 {{ item.name }} - Quantité : {{ item.quantity }} -
                 {{ (item.price * item.quantity).toFixed(2) }} €
               </li>
             </ul>
-            <p class="order-total">Total : {{ order.total }} €</p>
+            <p class="order-total">Total : {{ order.total_amount }} €</p>
           </div>
           <div class="order-status">
             <span :class="['status-badge', order.status.toLowerCase()]">
@@ -42,14 +41,24 @@
 </template>
 
 <script>
-import { computed } from "vue";
-import { cartStore } from "../stores/CartStore";
+import { ref, onMounted } from "vue";
+import { api } from "../services/api";
 
 export default {
   name: "AdminOrdersPage",
   setup() {
-    // Utiliser computed pour réagir aux changements du store
-    const orders = computed(() => cartStore.orders);
+    const orders = ref([]);
+
+    const fetchOrders = async () => {
+      try {
+        const response = await api.getOrders();
+        // console.log(response);
+        
+        orders.value = response;
+      } catch (error) {
+        console.error('Erreur lors de la récupération des commandes:', error);
+      }
+    };
 
     const formatDate = (dateString) => {
       const date = new Date(dateString);
@@ -59,9 +68,37 @@ export default {
       }).format(date);
     };
 
-    const markOrderReady = (orderId) => {
-      cartStore.updateOrderStatus(orderId, "Prête");
+
+//     const formatDate = (dateString) => {
+//   if (!dateString) {
+//     console.error("Date invalide reçue:", dateString);
+//     return "Date invalide";
+//   }
+
+//   const date = new Date(dateString);
+//   if (isNaN(date.getTime())) {
+//     console.error("Date invalide après conversion:", dateString);
+//     return "Date invalide";
+//   }
+
+//   return new Intl.DateTimeFormat("fr-FR", {
+//     dateStyle: "full",
+//     timeStyle: "short",
+//   }).format(date);
+// };
+
+
+    const markOrderReady = async (orderId) => {
+      try {
+        await api.updateOrderStatus(orderId, "Prête");
+        // Recharge les commandes pour mettre à jour l'affichage
+        fetchOrders();
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour du statut de la commande:', error);
+      }
     };
+
+    onMounted(fetchOrders);
 
     return {
       orders,
@@ -71,6 +108,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style scoped>
 .admin-orders {

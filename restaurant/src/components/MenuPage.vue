@@ -4,12 +4,30 @@
       <h1 class="title">Notre Menu</h1>
       <div class="underline"></div>
     </div>
-
+    
+<!-- bouton pour voir tous les plats  -->
+    <div class="filter-buttons">
+  <button
+    @click="setFilter(null)"
+    :class="{ active: activeFilter === null }">
+    Tous
+  </button>
+    </div>
+    <div class="filter-buttons">
+      <button
+        v-for="category in categories"
+        :key="category.id"
+        @click="setFilter(category.id)"
+        :class="{ active: activeFilter === category.id }"
+      >
+        {{ category.name }}
+      </button>
+    </div>
     <div class="dishes">
-      <div v-for="dish in menu" :key="dish.id" class="dish-wrapper">
+      <div v-for="dish in filteredMenu" :key="dish.id" class="dish-wrapper">
         <div class="dish-card">
           <div class="dish-image-container">
-            <img :src="dish.image" :alt="dish.name" class="dish-image" />
+            <img :src="dish.image_url" :alt="dish.name" class="dish-image" />
             <div class="dish-overlay">
               <button class="quick-view-btn" @click="openQuickView(dish)">
                 Aperçu rapide
@@ -20,7 +38,7 @@
             <h3 class="dish-title">{{ dish.name }}</h3>
             <p class="dish-description">{{ dish.description }}</p>
             <div class="dish-footer">
-              <span class="dish-price">{{ dish.price.toFixed(2) }} €</span>
+              <span class="dish-price">{{ formatPrice(dish.price) }} €</span>
               <button class="add-to-cart-btn" @click="handleAddToCart(dish)">
                 Ajouter au panier
               </button>
@@ -37,19 +55,14 @@
           &times;
         </button>
         <div class="modal-image">
-          <img :src="selectedDish.image" :alt="selectedDish.name" />
+          <img :src="selectedDish.image_url" :alt="selectedDish.name" />
         </div>
         <div class="modal-info">
           <h2>{{ selectedDish.name }}</h2>
           <p>{{ selectedDish.description }}</p>
           <div class="modal-footer">
-            <span class="modal-price"
-              >{{ selectedDish.price.toFixed(2) }} €</span
-            >
-            <button
-              @click="handleAddToCart(selectedDish)"
-              class="add-to-cart-btn"
-            >
+            <span class="modal-price">{{ formatPrice(selectedDish.price) }} €</span>
+            <button @click="handleAddToCart(selectedDish)" class="add-to-cart-btn">
               Ajouter au panier
             </button>
           </div>
@@ -65,18 +78,46 @@
 </template>
 
 <script>
-import { ref, watch } from "vue";
-import { menuService } from "../services/MenuService";
-import { cartStore } from "../stores/CartStore";
+import { ref, computed, onMounted } from "vue";
+import { api } from "../services/api.js";
 
 export default {
   name: "MenuPage",
   setup() {
-    const menu = ref(menuService.getMenu());
-    const cart = ref(cartStore.cart);
+    const menu = ref([]);
+    const categories = ref([]);
+    const activeFilter = ref(null);
+    const cart = ref(JSON.parse(localStorage.getItem('cart')) || []);
     const selectedDish = ref(null);
     const showToast = ref(false);
     const toastMessage = ref("");
+
+    const loadMenu = async () => {
+      try {
+        menu.value = await api.getProducts();
+      } catch (error) {
+        console.error('Erreur lors du chargement du menu:', error);
+      }
+    };
+
+    const loadCategories = async () => {
+      try {
+        categories.value = await api.getCategories();
+      } catch (error) {
+        console.error('Erreur lors du chargement des catégories:', error);
+      }
+    };
+
+    const filteredMenu = computed(() => {
+      if (activeFilter.value === null) {
+        return menu.value;
+      }
+      return menu.value.filter(dish => dish.category_id === activeFilter.value);
+    });
+
+    const setFilter = (categoryId) => {
+      activeFilter.value = categoryId === activeFilter.value ? null : categoryId;
+    };
 
     const showNotification = (message) => {
       toastMessage.value = message;
@@ -87,8 +128,13 @@ export default {
     };
 
     const handleAddToCart = (dish) => {
-      cartStore.addToCart(dish);
-      cart.value = [...cartStore.cart];
+      const found = cart.value.find((item) => item.id === dish.id);
+      if (found) {
+        found.quantity += 1;
+      } else {
+        cart.value.push({ ...dish, quantity: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart.value));
       showNotification(`${dish.name} a été ajouté au panier`);
     };
 
@@ -96,22 +142,38 @@ export default {
       selectedDish.value = dish;
     };
 
-    watch(cart, (newCart) => {
-      console.log("Le panier a été mis à jour :", newCart);
+    const formatPrice = (price) => {
+      const numericPrice = Number(price);
+      return isNaN(numericPrice) ? price : numericPrice.toFixed(2);
+    };
+
+    onMounted(() => {
+      loadMenu();
+      loadCategories();
     });
 
     return {
       menu,
+      filteredMenu,
+      categories,
+      activeFilter,
       cart,
       handleAddToCart,
       selectedDish,
       openQuickView,
       showToast,
       toastMessage,
+      formatPrice,
+      setFilter,
     };
   },
 };
 </script>
+
+
+
+
+
 
 <style scoped>
 .menu-page {
@@ -379,6 +441,44 @@ export default {
 
 .show-toast {
   transform: translateX(0);
+}
+
+
+/* partie filter boutons  */
+
+.filter-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .filter-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.filter-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-buttons button.active {
+  background: linear-gradient(135deg, #ff3366, #dc143c);
+  color: white;
+  box-shadow: 
+    0 4px 6px -1px rgba(220, 20, 60, 0.2),
+    0 10px 15px -3px rgba(220, 20, 60, 0.1);
 }
 
 @keyframes fadeIn {
