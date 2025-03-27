@@ -1,0 +1,7 @@
+RewriteEngine On
+RewriteBase /
+
+# Redirection des requêtes inexistantes vers index.html (pour une SPA Vue.js)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /dist/index.html [L]
