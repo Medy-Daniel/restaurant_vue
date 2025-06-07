@@ -10,6 +10,11 @@ export default defineConfig({
     vue(),
     vueDevTools(),
   ],
+   server: {
+    host: true,
+    port: 3000,
+    allowedHosts: ['restaurant-vue-9dgm.onrender.com']
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
