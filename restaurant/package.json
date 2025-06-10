@@ -4,7 +4,7 @@
   "description": "This template should help get you started developing with Vue 3 in Vite.",
   "main": "ecosystem.config.js",
   "scripts": {
-     "dev": "vite dev --host --port $PORT",
+    "dev": "vite dev --host --port 3000",
     "build": "vite build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
@@ -12,11 +12,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "type": "module",
   "dependencies": {
     "axios": "^1.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "mongodb": "^6.17.0",
     "mysql2": "^3.14.1",
     "vue": "^3.5.16",
     "vue-router": "^4.5.1"
