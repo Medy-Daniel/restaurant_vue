@@ -7,15 +7,15 @@
     </div>
 
     <div v-else class="order-list">
-      <div v-for="order in orders" :key="order.id" class="order-item">
-        <h2>Commande n°{{ order.id }}</h2>
+      <div v-for="order in orders" :key="order._id" class="order-item">
+        <h2>Commande n°{{ order._id }}</h2>
         <p class="order-date">{{ formatDate(order.created_at) }}</p>
         <div class="order-details">
           <div class="items-list">
             <ul>
-              <li v-for="item in order.items" :key="item.id">
+              <li v-for="item in order.items" :key="item._id">
                 {{ item.name }} - Quantité : {{ item.quantity }} -
-                {{ (item.price * item.quantity).toFixed(2) }} €
+                {{ (item.unit_price * item.quantity).toFixed(2) }} €
               </li>
             </ul>
             <p class="order-total">Total : {{ order.total_amount }} €</p>

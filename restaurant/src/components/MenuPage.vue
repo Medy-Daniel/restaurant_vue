@@ -16,9 +16,9 @@
     <div class="filter-buttons">
       <button
         v-for="category in categories"
-        :key="category.id"
-        @click="setFilter(category.id)"
-        :class="{ active: activeFilter === category.id }"
+        :key="category._id"
+        @click="setFilter(category._id)"
+        :class="{ active: activeFilter === category._id }"
       >
         {{ category.name }}
       </button>
@@ -112,7 +112,8 @@ export default {
       if (activeFilter.value === null) {
         return menu.value;
       }
-      return menu.value.filter(dish => dish.category_id === activeFilter.value);
+     return menu.value.filter(dish => dish.category_id === activeFilter.value);
+
     });
 
     const setFilter = (categoryId) => {
@@ -127,16 +128,38 @@ export default {
       }, 3000);
     };
 
+    // const handleAddToCart = (dish) => {
+    //   const found = cart.value.find((item) => item.id === dish.id);
+    //   if (found) {
+    //     found.quantity += 1;
+    //   } else {
+    //     cart.value.push({ ...dish, quantity: 1 });
+    //   }
+    //   localStorage.setItem('cart', JSON.stringify(cart.value));
+    //   showNotification(`${dish.name} a été ajouté au panier`);
+    // };
+
     const handleAddToCart = (dish) => {
-      const found = cart.value.find((item) => item.id === dish.id);
-      if (found) {
+    // IMPORTANT: Convertir l'ID du plat en string pour la comparaison
+    // et s'assurer que c'est bien l'ObjectId qui est potentiellement converti.
+    const dishIdString = dish._id ? dish._id.toString() : dish.id; // Utilisez _id si présent, sinon id
+
+    const found = cart.value.find((item) => {
+        // Convertir l'ID de l'item du panier en string pour la comparaison
+        const itemIdString = item._id ? item._id.toString() : item.id;
+        return itemIdString === dishIdString;
+    });
+
+    if (found) {
         found.quantity += 1;
-      } else {
-        cart.value.push({ ...dish, quantity: 1 });
-      }
-      localStorage.setItem('cart', JSON.stringify(cart.value));
-      showNotification(`${dish.name} a été ajouté au panier`);
-    };
+    } else {
+        // Si l'élément n'est pas trouvé, ajoutez-le.
+        // Assurez-vous de stocker l'ID comme string dans le panier aussi pour les futures comparaisons
+        cart.value.push({ ...dish, _id: dishIdString, id: dishIdString, quantity: 1 }); // Stockez _id et id comme string
+    }
+    localStorage.setItem('cart', JSON.stringify(cart.value));
+    showNotification(`${dish.name} a été ajouté au panier`);
+};
 
     const openQuickView = (dish) => {
       selectedDish.value = dish;
@@ -429,7 +452,7 @@ export default {
 .toast {
   position: fixed;
   bottom: 2rem;
-  right: 2rem;
+  right: 0rem;
   background: #1a1a1a;
   color: white;
   padding: 1rem 2rem;
