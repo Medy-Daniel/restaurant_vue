@@ -125,16 +125,16 @@ app.get('/api/orders', async (req, res) => {
 });
 
 // Route pour mettre à jour le statut d'une commande
-app.put('/api/orders/:orderId/status', async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const { status } = req.body;
-        await db.collection('orders').updateOne({ _id: new ObjectId(orderId) }, { $set: { status } });
-        res.json({ message: 'Statut de la commande mis à jour' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+// app.put('/api/orders/:orderId/status', async (req, res) => {
+//     try {
+//         const { orderId } = req.params;
+//         const { status } = req.body;
+//         await db.collection('orders').updateOne({ _id: new ObjectId(orderId) }, { $set: { status } });
+//         res.json({ message: 'Statut de la commande mis à jour' });
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
 
 // Route pour récupérer les catégories
 app.get('/api/categories', async (req, res) => {
