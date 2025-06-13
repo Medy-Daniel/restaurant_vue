@@ -13,7 +13,6 @@ export default defineConfig({
    server: {
     host: true,
     port: 5000,
-    allowedHosts: ['restaurant-vue-9dgm.onrender.com'],
     allowedHosts: ['restaurant-vue-mongodb.onrender.com']
   },
   build: {
